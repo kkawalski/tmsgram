@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %} 
+    {% if request.user == post.user %}
+        <img src="{{ post.image.url }}" alt="">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save</button>
+        </form>
+    {% else %}
+        <h2>{{ post }}</h2>
+    {% endif %}
+{% endblock %}

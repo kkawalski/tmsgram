@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if request.user == user %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save</button>
+        </form>
+    {% else %}
+        <h2>{{ user }}</h2>
+        <div>
+            <form action="{% url 'follow' slug=user.username %}", method="POST">
+                {% csrf_token %}
+                <button type="submit">
+                    {% if user in request.user.following.all %}
+                        Unfollow
+                    {% else %}
+                        Follow
+                    {% endif %}
+                </button> 
+                
+            </form>
+        </div>
+    {% endif %}
+    {% for post in user.posts.all %}
+        <p><a href="{% url 'post_detail' pk=post.id %}">{{ post.description }}</a></p>
+    {% endfor %}
+{% endblock %}
