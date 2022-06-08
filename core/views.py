@@ -1,16 +1,27 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.contrib.auth import login
 from django.urls import reverse_lazy
-from django.views.generic import UpdateView, ListView, View
+from django.views.generic import UpdateView, ListView, View, CreateView
 from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import redirect, render
 
-from core.forms import UserUpdateForm
+from core.forms import UserUpdateForm, RegisterForm
 from core.models import User
 
 
 def hello(request):
     return render(request, "base.html")
+
+
+class UserRegisterView(CreateView):
+    template_name = "registration/register.html"
+    model = User
+    form_class = RegisterForm
+    
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect(reverse_lazy("profile", kwargs={"slug": user.username}))
 
 
 class ProfileDetailView(LoginRequiredMixin, UpdateView):

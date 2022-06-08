@@ -1,8 +1,18 @@
+import os
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models import Q, Value as V
 from django.db.models.functions import Concat
 from django.contrib.auth.models import AbstractUser, UserManager
+
+
+class TimeStampMixin(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
 
 
 class ProfileMixin(object):
@@ -25,12 +35,17 @@ class ProfileManager(UserManager, ProfileMixin):
         return ProfileQuerySet(self.model, using=self._db).annotate(fullname=fullname)
 
 
-class User(AbstractUser):
+def upload_avatar(instance, filename):
+    return os.path.join(instance.username, f"avatar_{filename}")
+
+
+class User(TimeStampMixin, AbstractUser):
     following = models.ManyToManyField(
         "core.User", 
         related_name="followers",
         blank=True, null=True,
     )
+    avatar = models.ImageField(upload_to=upload_avatar, blank=True, null=True)
 
     @property
     def full_name(self) -> str:

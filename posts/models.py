@@ -1,7 +1,9 @@
+import os
+from django.conf import settings
 from django.db import models
 from django.db.models import QuerySet, Q
 
-from core.models import User
+from core.models import TimeStampMixin, User
 
 
 class PostMixin(object):
@@ -19,9 +21,13 @@ class PostManager(models.Manager, PostMixin):
         return PostQuerySet(self.model, using=self._db)
 
 
-class Post(models.Model):
+def upload_to_user_dir(instance, filename):
+    return os.path.join(instance.user.username, filename)
+
+
+class Post(TimeStampMixin):
     description = models.CharField(max_length=255)
-    image = models.ImageField(blank=True, null=True)
+    image = models.ImageField(upload_to=upload_to_user_dir, blank=True, null=True)
     user = models.ForeignKey(
         "core.User", 
         on_delete=models.CASCADE,
@@ -33,3 +39,6 @@ class Post(models.Model):
 
     def __str__(self) -> str:
         return f"Post {self.id} by user {self.user}"
+
+    class Meta:
+        ordering = ("-created_at", "-id")
