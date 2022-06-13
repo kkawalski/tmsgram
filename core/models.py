@@ -23,14 +23,15 @@ class HashTagMixin(models.Model):
             r"<a href='search/hashtag/\1'>#\1</a>", 
             self.description)  
 
-    def save(self, force_insert: bool = ..., force_update: bool = ..., using = ..., update_fields = ...) -> None:
+    def save(self, *args, **kwargs) -> None:
         from posts.models import HashTag
-        hashtags = re.findall(
-            r"#+([a-zA-Z0-9(_)]{1,})",
-            self.description
-        )
-        [HashTag.objects.get_or_create(text=hashtag) for hashtag in hashtags]
-        return super().save(force_insert, force_update, using, update_fields)
+        if self.description:
+            hashtags = re.findall(
+                r"#+([a-zA-Z0-9(_)]{1,})",
+                self.description
+            )
+            [HashTag.objects.get_or_create(text=hashtag) for hashtag in hashtags]
+        return super().save(*args, **kwargs)
     
     class Meta:
         abstract = True
