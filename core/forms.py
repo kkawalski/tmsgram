@@ -1,7 +1,17 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
+from django.forms.fields import CharField
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 
 from core.models import User
+
+
+class SearchForm(Form):
+    text = CharField()
+
+    class Meta:
+        fields = [
+            "text"
+        ]
 
 
 class UserUpdateForm(ModelForm):

@@ -1,12 +1,16 @@
+import itertools
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login
 from django.urls import reverse_lazy
-from django.views.generic import UpdateView, ListView, View, CreateView
+from django.views.generic import UpdateView, ListView, View, CreateView, FormView
 from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import redirect, render
 
-from core.forms import UserUpdateForm, RegisterForm
+from core.forms import SearchForm, UserUpdateForm, RegisterForm
 from core.models import User
+from core.utils import redirect_params
+from posts.models import HashTag, Post
 
 
 def hello(request):
@@ -67,3 +71,25 @@ class ProfileListView(LoginRequiredMixin, ListView):
         context["users"] = users
         return context
 
+
+class SearchView(LoginRequiredMixin, FormView):
+    template_name = "search.html"
+    form_class = SearchForm
+    success_url = reverse_lazy("search")
+
+    def get_context_data(self, **kwargs):
+        search = self.request.GET.get("search", "")
+        context = super().get_context_data(**kwargs)
+        users = User.objects.search(search)
+        hashtags = HashTag.objects.filter(text__icontains=search)
+        posts = Post.objects.select_related("user").filter(description__icontains=search)
+        context["object_list"] = [{
+            "user": row[0],
+            "hashtag": row[1],
+            "post": row[2],
+        } for row in itertools.zip_longest(users, hashtags, posts)]
+        return context
+
+    def form_valid(self, form):
+        return redirect_params(self.get_success_url(), {"search": form.data["text"]})
+    

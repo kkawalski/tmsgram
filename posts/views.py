@@ -1,10 +1,11 @@
+import re
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, DetailView
 from django.urls import reverse_lazy
 
 from posts.forms import PostCreateForm
-from posts.models import Post
+from posts.models import HashTag, Post
 
 
 class PostDetailView(LoginRequiredMixin, UpdateView):
@@ -16,7 +17,6 @@ class PostDetailView(LoginRequiredMixin, UpdateView):
     def get_success_url(self) -> str:
         url = reverse_lazy("post_detail", kwargs={"pk": self.object.id})
         return url
-
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -35,3 +35,10 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
+
+
+class HashTagDetailView(LoginRequiredMixin, DetailView):
+    model = HashTag
+    template_name = "hashtag.html"
+    slug_field = "text"
+    

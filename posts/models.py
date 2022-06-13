@@ -1,9 +1,11 @@
 import os
-from django.conf import settings
+import re
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey 
 from django.db import models
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet
 
-from core.models import TimeStampMixin, User
+from core.models import TimeStampMixin, User, HashTagMixin
 
 
 class PostMixin(object):
@@ -25,7 +27,7 @@ def upload_to_user_dir(instance, filename):
     return os.path.join(instance.user.username, filename)
 
 
-class Post(TimeStampMixin):
+class Post(HashTagMixin, TimeStampMixin):
     description = models.CharField(max_length=255)
     image = models.ImageField(upload_to=upload_to_user_dir, blank=True, null=True)
     user = models.ForeignKey(
@@ -42,3 +44,11 @@ class Post(TimeStampMixin):
 
     class Meta:
         ordering = ("-created_at", "-id")
+
+
+class HashTag(TimeStampMixin):
+    text = models.CharField(max_length=255, unique=True)
+
+    def __str__(self) -> str:
+        return f"Hashtag {self.text}"
+    

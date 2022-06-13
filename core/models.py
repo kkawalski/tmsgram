@@ -1,4 +1,5 @@
 import os
+import re
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models import Q, Value as V
@@ -13,6 +14,26 @@ class TimeStampMixin(models.Model):
     class Meta:
         abstract = True
 
+
+class HashTagMixin(models.Model):
+    @property
+    def formatted_description(self):
+        return re.sub(
+            r"#+([a-zA-Z0-9(_)]{1,})",
+            r"<a href='search/hashtag/\1'>#\1</a>", 
+            self.description)  
+
+    def save(self, force_insert: bool = ..., force_update: bool = ..., using = ..., update_fields = ...) -> None:
+        from posts.models import HashTag
+        hashtags = re.findall(
+            r"#+([a-zA-Z0-9(_)]{1,})",
+            self.description
+        )
+        [HashTag.objects.get_or_create(text=hashtag) for hashtag in hashtags]
+        return super().save(force_insert, force_update, using, update_fields)
+    
+    class Meta:
+        abstract = True
 
 
 class ProfileMixin(object):
@@ -39,12 +60,13 @@ def upload_avatar(instance, filename):
     return os.path.join(instance.username, f"avatar_{filename}")
 
 
-class User(TimeStampMixin, AbstractUser):
+class User(HashTagMixin, TimeStampMixin, AbstractUser):
     following = models.ManyToManyField(
         "core.User", 
         related_name="followers",
         blank=True, null=True,
     )
+    description = models.TextField(blank=True, null=True)
     avatar = models.ImageField(upload_to=upload_avatar, blank=True, null=True)
 
     @property
