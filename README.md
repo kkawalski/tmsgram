@@ -9,5 +9,6 @@
  - pip install -r requirements.txt
 ## run
  - python manage.py migrate
+ - python manage.py createtestdb
  - python manage.py createsuperuser
  - python manage.py runserver
