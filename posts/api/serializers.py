@@ -8,8 +8,10 @@ class PostBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
+            "id",
             "description",
             "image",
+            "is_active",
         ]
 
 

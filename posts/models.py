@@ -13,6 +13,11 @@ class PostMixin(object):
         query = models.Q(user__in=user.following.all())
         query |= models.Q(user=user)
         return self.filter(query)
+    
+    def filter_is_active(self):
+        query = models.Q(user__is_active=True)
+        query &= models.Q(is_active=True)
+        return self.filter(query)
 
 class PostQuerySet(QuerySet, PostMixin):
     pass
@@ -36,6 +41,7 @@ class Post(HashTagMixin, TimeStampMixin):
         related_name="posts",
         blank=False, null=False,
     )
+    is_active = models.BooleanField(default=True)
 
     objects = PostManager()
 

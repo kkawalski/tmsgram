@@ -43,6 +43,8 @@ class UserBaseSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "followed_by_me",
+            "is_active",
+            "is_superuser",
         ]
 
     def update(self, instance, validated_data):
@@ -55,19 +57,14 @@ class UserBaseSerializer(serializers.ModelSerializer):
 
 from posts.api.serializers import PostBaseSerializer
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(UserBaseSerializer):
     total_following = serializers.SerializerMethodField(read_only=True)
     total_followers = serializers.SerializerMethodField(read_only=True)
     posts = PostBaseSerializer(read_only=True, many=True)
 
-    class Meta:
+    class Meta(UserBaseSerializer.Meta):
         model = User
-        fields = [
-            "id",
-            "username",
-            "email",
-            "first_name",
-            "last_name",
+        fields = UserBaseSerializer.Meta.fields + [
             "posts",
             "total_following",
             "total_followers",
