@@ -4,5 +4,5 @@ from core.api.views import UserViewSet
 
 
 router = routers.DefaultRouter()
-router.register("api", UserViewSet)
+router.register("profiles", UserViewSet)
 urlpatterns = router.urls

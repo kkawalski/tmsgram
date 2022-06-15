@@ -65,7 +65,7 @@ class User(HashTagMixin, TimeStampMixin, AbstractUser):
     following = models.ManyToManyField(
         "core.User", 
         related_name="followers",
-        blank=True, null=True,
+        blank=True,
     )
     description = models.TextField(blank=True, null=True)
     avatar = models.ImageField(upload_to=upload_avatar, blank=True, null=True)

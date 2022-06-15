@@ -6,7 +6,7 @@ from core.views import ProfileListView, SearchView, hello, ProfileDetailView, Fo
 
 urlpatterns = [
     path("", hello),
-    path("profiles/", include("core.api.urls")),
+    path("api/", include("core.api.urls")),
     path("profiles", ProfileListView.as_view(), name="profile_list"),
     path("profiles/<slug>", ProfileDetailView.as_view(), name="profile"),
     path("profiles/<slug>/follow", FollowView.as_view(), name="follow"),

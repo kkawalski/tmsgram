@@ -5,5 +5,5 @@ from posts.api.views import PostViewSet
 
 
 router = routers.DefaultRouter()
-router.register("api", PostViewSet)
+router.register("posts", PostViewSet)
 urlpatterns = router.urls

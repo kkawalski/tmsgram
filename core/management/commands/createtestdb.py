@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from django.core.files import File
 
 from core.models import User
-from posts.models import Post, HashTag
+from posts.models import Post
 
 usernames = ["test", "user", "dummy"]
 posts = ["description", "test", "dummy", "#tag", "#lol", "#mem"]
@@ -22,9 +22,15 @@ def get_random_cat_image():
     return name, File(open(content[0], "rb"))
 
 
-
 class Command(BaseCommand):
     help = "Init test data"
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--with-pictures",
+            default=False,
+            help="Include pictures or not"
+        )
 
     def handle(self, *args, **options):
         for i in range(random.randint(3, 7)):
@@ -37,6 +43,8 @@ class Command(BaseCommand):
                     first_name=username.capitalize(),
                     last_name=username.capitalize(),
                 )
+                if options.get("with-pictures"):
+                    user.avatar.save(*get_random_cat_image())
                 user.set_password(username)
                 user.save()
             self.stdout.write(f"Created user {user}")
@@ -46,7 +54,8 @@ class Command(BaseCommand):
                     description=description,
                     user=user, 
                 )
-                post.image.save(*get_random_cat_image())
+                if options.get("with-pictures"):
+                    post.image.save(*get_random_cat_image())
                 post.save()
                 self.stdout.write(f"Created post {post}")
         self.stdout.write("SUCCESS!")
