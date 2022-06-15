@@ -14,7 +14,7 @@ class PostBaseSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(PostBaseSerializer):
-    user = UserBaseSerializer()
+    user = UserBaseSerializer(default=serializers.CurrentUserDefault())
     
     class Meta(PostBaseSerializer.Meta):
         fields = PostBaseSerializer.Meta.fields + [
