@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  backend:
+    build: tmsgram-backend
+    env_file:
+      - "tmsgram-backend/.env"
+    restart: always
+    ports: 
+      - "8000:8000"
+    volumes:
+      - ./tmsgram-backend:/app
+    depends_on:
+      - db
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+  celery:
+    restart: always
+    build: tmsgram-backend
+    command: celery -A config worker -l info
+    volumes:
+      - ./tmsgram-backend:/app
+    depends_on:
+      - db
+      - redis
+      - backend
+  frontend:
+    build: tmsgram-frontend
+    env_file:
+      - "./tmsgram-frontend/.env"
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./tmsgram-frontend:/app
+  db:
+    image: postgres:13-alpine
+    restart: always
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - tmsgram:/var/lib/postgresql
+  redis:
+    image: redis:alpine
+volumes:
+  tmsgram:

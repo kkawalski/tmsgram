@@ -1,0 +1,6 @@
+[submodule "tmsgram-backend"]
+	path = tmsgram-backend
+	url = https://github.com/kkawalski/tmsgram-backend
+[submodule "tmsgram-frontend"]
+	path = tmsgram-frontend
+	url = https://github.com/kkawalski/tmsgram-frontend
